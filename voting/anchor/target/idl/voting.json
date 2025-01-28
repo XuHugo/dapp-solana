@@ -39,7 +39,7 @@
               },
               {
                 "kind": "arg",
-                "path": "candidate"
+                "path": "candidate_name"
               }
             ]
           }
@@ -177,7 +177,7 @@
               },
               {
                 "kind": "arg",
-                "path": "candidate"
+                "path": "candidate_name"
               }
             ]
           }
@@ -189,7 +189,7 @@
           "type": "u64"
         },
         {
-          "name": "candidate",
+          "name": "candidate_name",
           "type": "string"
         }
       ]
@@ -257,6 +257,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "poll_id",
+            "type": "u64"
+          },
           {
             "name": "poll_name",
             "type": "string"

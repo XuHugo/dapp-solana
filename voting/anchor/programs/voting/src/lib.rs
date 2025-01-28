@@ -16,6 +16,7 @@ pub mod voting {
         end_time: u64,
         description: String,
     ) -> Result<()> {
+        ctx.accounts.poll_account.poll_id = poll_id;
         ctx.accounts.poll_account.poll_name = poll_name;
         ctx.accounts.poll_account.poll_voting_start = start_time;
         ctx.accounts.poll_account.poll_voting_end = end_time;
@@ -33,7 +34,7 @@ pub mod voting {
         Ok(())
     }
 
-    pub fn vote(ctx: Context<Vote>, poll_id: u64, candidate: String) -> Result<()> {
+    pub fn vote(ctx: Context<Vote>, poll_id: u64, candidate_name: String) -> Result<()> {
         let candidate_account = &mut ctx.accounts.candidate_account;
         let current_time = Clock::get()?.unix_timestamp;
         if current_time > (ctx.accounts.poll_account.poll_voting_end as i64) {
@@ -64,7 +65,7 @@ pub struct InitializePoll<'info> {
     pub system_program: Program<'info, System>,
 }
 #[derive(Accounts)]
-#[instruction(poll_id: u64, candidate: String)]
+#[instruction(poll_id: u64, candidate_name: String)]
 pub struct InitializeCandidate<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -74,7 +75,7 @@ pub struct InitializeCandidate<'info> {
   init,
   payer = payer, // close account and return lamports to payer
   space = 8 + CandidateAccount::INIT_SPACE,
-  seeds = [poll_id.to_le_bytes().as_ref(), candidate.as_ref()],
+  seeds = [poll_id.to_le_bytes().as_ref(), candidate_name.as_ref()],
   bump
   )]
     pub candidate_account: Account<'info, CandidateAccount>,
@@ -82,7 +83,7 @@ pub struct InitializeCandidate<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(poll_id: u64, candidate: String)]
+#[instruction(poll_id: u64, candidate_name: String)]
 pub struct Vote<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -94,7 +95,7 @@ pub struct Vote<'info> {
     pub poll_account: Account<'info, PollAccount>,
     #[account(
       mut,
-      seeds = [poll_id.to_le_bytes().as_ref(), candidate.as_ref()],
+      seeds = [poll_id.to_le_bytes().as_ref(), candidate_name.as_ref()],
       bump, // bump seed  to generate a new address
     )]
     pub candidate_account: Account<'info, CandidateAccount>,
@@ -111,6 +112,7 @@ pub struct CandidateAccount {
 #[account]
 #[derive(InitSpace)]
 pub struct PollAccount {
+    pub poll_id: u64,
     #[max_len(32)]
     pub poll_name: String,
     #[max_len(280)]

@@ -45,7 +45,7 @@ export type Voting = {
               },
               {
                 "kind": "arg",
-                "path": "candidate"
+                "path": "candidateName"
               }
             ]
           }
@@ -183,7 +183,7 @@ export type Voting = {
               },
               {
                 "kind": "arg",
-                "path": "candidate"
+                "path": "candidateName"
               }
             ]
           }
@@ -195,7 +195,7 @@ export type Voting = {
           "type": "u64"
         },
         {
-          "name": "candidate",
+          "name": "candidateName",
           "type": "string"
         }
       ]
@@ -263,6 +263,10 @@ export type Voting = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "pollId",
+            "type": "u64"
+          },
           {
             "name": "pollName",
             "type": "string"
