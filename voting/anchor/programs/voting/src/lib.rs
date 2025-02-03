@@ -2,7 +2,7 @@
 
 use anchor_lang::prelude::*;
 
-declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+declare_id!("75HvzP19wM3b1q9mdXcAkGK8rnYZ5Dsa4PXn2kvszQz5");
 
 #[program]
 pub mod voting {
@@ -16,6 +16,8 @@ pub mod voting {
         end_time: u64,
         description: String,
     ) -> Result<()> {
+        msg!("initialize_poll: {:?}", poll_id);
+        msg!("initialize_poll: {:?}", poll_name);
         ctx.accounts.poll_account.poll_id = poll_id;
         ctx.accounts.poll_account.poll_name = poll_name;
         ctx.accounts.poll_account.poll_voting_start = start_time;
@@ -29,6 +31,8 @@ pub mod voting {
         poll_id: u64,
         candidate_name: String,
     ) -> Result<()> {
+        msg!("initialize_candidate: {:?}", poll_id);
+        msg!("initialize_candidate: {:?}", candidate_name);
         ctx.accounts.candidate_account.candidate_name = candidate_name;
         ctx.accounts.poll_account.poll_option_index += 1;
         Ok(())
@@ -44,6 +48,9 @@ pub mod voting {
             return Err(ErrorCode::VotingNotStarted.into());
         }
         candidate_account.candidate_votes += 1;
+        msg!("vote: {:?}", poll_id);
+        msg!("vote: {:?}", candidate_name);
+        msg!("vote: {:?}", candidate_account.candidate_votes);
         Ok(())
     }
 }

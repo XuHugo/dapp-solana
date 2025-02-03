@@ -5,16 +5,18 @@ import { Voting } from '../target/types/voting'
 import { BankrunProvider, startAnchor } from 'anchor-bankrun';
 
 const IDL = require('../target/idl/voting.json');
-const votingAddress = new PublicKey("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+const votingAddress = new PublicKey("75HvzP19wM3b1q9mdXcAkGK8rnYZ5Dsa4PXn2kvszQz5");
 
 describe('voting', () => {
 
   let context;
   let provider;
-  let votingProgram: anchor.Program<Voting>;
+  //let votingProgram: anchor.Program<Voting>;
+  anchor.setProvider(anchor.AnchorProvider.env());
+  let votingProgram = anchor.workspace.Voting as Program<Voting>;
 
   beforeAll(async () => {
-    context = await startAnchor(
+    /*context = await startAnchor(
       "",
       [{ name: "voting", programId: votingAddress }],
       []);
@@ -22,17 +24,17 @@ describe('voting', () => {
 
     votingProgram = new Program<Voting>(
       IDL,
-      provider);
+      provider);*/
   })
 
   it('Initialize Poll', async () => {
 
     await votingProgram.methods.initializePoll(
       new anchor.BN(1),
-      "WIB",
+      "FL",
       new anchor.BN(0),
-      new anchor.BN(1738166397),
-      "Who is the best?",
+      new anchor.BN(1748166397),
+      "favorite language",
     ).rpc();
 
     const [pollAddress] = PublicKey.findProgramAddressSync(
@@ -43,7 +45,7 @@ describe('voting', () => {
       pollAddress
     );
     console.log(poll);
-    expect(poll.pollName).toEqual("WIB");
+    expect(poll.pollName).toEqual("FL");
     expect(poll.pollVotingStart.toNumber()).toEqual(0);
   })
 
@@ -55,7 +57,7 @@ describe('voting', () => {
 
     await votingProgram.methods.initializeCandidate(
       new anchor.BN(1),
-      "Kent",
+      "Rust",
     ).accounts({
       pollAccount: pollAddress
     })
@@ -63,14 +65,14 @@ describe('voting', () => {
 
     await votingProgram.methods.initializeCandidate(
       new anchor.BN(1),
-      "Andy",
+      "Typescript",
     ).accounts({
       pollAccount: pollAddress
     })
       .rpc();
 
     const [candidateAddress1] = PublicKey.findProgramAddressSync(
-      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Kent")],
+      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Rust")],
       votingAddress
     );
     const candidate1 = await votingProgram.account.candidateAccount.fetch(
@@ -78,7 +80,7 @@ describe('voting', () => {
     );
     console.log(candidate1);
     const [candidateAddress2] = PublicKey.findProgramAddressSync(
-      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Andy")],
+      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Typescript")],
       votingAddress
     );
     const candidate2 = await votingProgram.account.candidateAccount.fetch(
@@ -86,25 +88,25 @@ describe('voting', () => {
     );
     console.log(candidate2);
 
-    expect(candidate1.candidateName).toEqual("Kent");
-    expect(candidate2.candidateName).toEqual("Andy");
+    expect(candidate1.candidateName).toEqual("Rust");
+    expect(candidate2.candidateName).toEqual("Typescript");
   })
 
   it('vote', async () => {
     await votingProgram.methods.vote(
       new anchor.BN(1),
-      "Kent",
+      "Rust",
     ).rpc();
 
     const [candidateAddress1] = PublicKey.findProgramAddressSync(
-      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Kent")],
+      [new anchor.BN(1).toArrayLike(Buffer, "le", 8), Buffer.from("Rust")],
       votingAddress
     );
     const candidate1 = await votingProgram.account.candidateAccount.fetch(
       candidateAddress1
     );
     console.log(candidate1);
-    expect(candidate1.candidateName).toEqual("Kent");
+    expect(candidate1.candidateName).toEqual("Rust");
     expect(candidate1.candidateVotes.toNumber()).toEqual(1);
   })
 
